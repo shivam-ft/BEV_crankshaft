@@ -70,3 +70,5 @@ pip install nuscenes-devkit pyquaternion timm matplotlib pillow
 2. Execute the cells in the main training notebook to train the model from scratch or load checkpointed weights.
 3. For validation, ensure the pre-trained weights (`bev_model_final2.pth`) and configuration file (`bev_cfg.pkl`) are accessible.
 4. Run the evaluation notebook to generate the JSON results, metric plots, and qualitative BEV sample comparisons.
+
+**Note**:Download all the files provided in the drive link to my drive folder of your drive.
