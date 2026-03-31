@@ -1,50 +1,72 @@
 # BEV Environment Mapping for Autonomous Vehicles
 
-## Overview
-Developed as a solution for a machine learning contest on environment mapping for autonomous vehicles, this project implements a Lift-Splat-Shoot (LSS) based deep learning model to predict Bird's-Eye View (BEV) occupancy grids entirely from multi-camera setups. The model ingests images from six surround-view cameras and projects them into a unified 3D ego-centric space to generate an accurate top-down map of the vehicle's surroundings. 
+## Project Overview
+This repository contains the complete solution developed for a machine learning hackathon focused on autonomous vehicle perception. The primary objective is to generate accurate Bird's-Eye View (BEV) occupancy grids using only 2D camera data. By leveraging a Lift-Splat-Shoot (LSS) deep learning architecture, the system ingests feeds from six surround-view cameras and projects them into a unified, ego-centric 3D space to predict environmental occupancy. 
 
-This repository contains the evaluation pipeline, model architecture definition, and validation results on the nuScenes dataset.
+This approach eliminates the reliance on expensive LiDAR sensors while maintaining robust spatial awareness for autonomous navigation.
 
-## Model Architecture
-The network is designed around the LSS paradigm, effectively translating 2D image features into a 3D dimensional space before flattening them into a BEV grid.
+## Repository Contents
+* **Model Training:** The complete training pipeline, dataset preprocessing, and model optimization steps are contained within the primary project notebook.
+* **Evaluation Pipeline:** The validation scripts, metric calculations, and threshold optimizations are handled in the evaluation notebook.
+* **Visual Data:** The repository includes training/architecture visual documentation, performance metric graphs, and direct BEV prediction comparisons against ground truth data.
+* **Results Summary:** Quantitative performance data across all tested thresholds is stored in the evaluation output file.
 
-* **Image Backbone:** Utilizes `efficientnet_b0` (via `timm`) to extract dense feature maps from the 6 input cameras. The input images are resized to 224x480 resolution.
-* **Depth Head (ASPP):** An Atrous Spatial Pyramid Pooling module is used to predict categorical depth distributions over 24 discrete depth bins (from 1.0m to 49.0m).
-* **LSS View Transformer:** Projects the 2D image features into 3D frustums using the predicted depth probabilities and known camera intrinsics/extrinsics. These features are then voxel-pooled into a 2D BEV grid.
-* **BEV Decoder:** A convolutional block that refines the aggregated BEV features and outputs the final binary occupancy probability map.
-* **Grid Specifications:** The final output is a 200x200 BEV grid representing a 100m x 100m area (-50.0m to 50.0m on X and Y axes) at a resolution of 0.5 meters per cell.
+---
 
-## Evaluation Metrics & Results
-The model was evaluated on the `v1.0-mini` validation split of the nuScenes dataset, consisting of 162 samples.
+## Technical Architecture
+The core model is designed to translate standard 2D image features into a top-down 3D representation. The architecture is broken down into four primary components:
 
-### Distance-Weighted Error
-Standard Intersection over Union (IoU) treats all pixels equally. To better suit the autonomous driving context, we implemented a custom Distance-Weighted Error metric. This applies a $1/r$ penalty weight map to the loss, prioritizing the accuracy of occupancy predictions closer to the ego-vehicle where immediate navigation decisions are critical.
+* **Camera Feature Extraction:** The model processes inputs from six cameras (Front, Front Right, Front Left, Back, Back Right, Back Left). It uses an `efficientnet_b0` backbone via the `timm` library to extract dense features from images resized to a 224x480 resolution.
+* **Depth Estimation (ASPP):** An Atrous Spatial Pyramid Pooling (ASPP) head is utilized to predict depth probabilities. The depth is categorized into 24 discrete bins ranging from 1.0m to 49.0m, with a step size of 2.0m.
+* **LSS View Transformer:** This module projects the 2D features into 3D frustums by combining the predicted depth distributions with the known camera intrinsic and extrinsic matrices. The 3D points are then voxel-pooled to aggregate features into a flat 2D grid.
+* **BEV Occupancy Decoder:** A custom convolutional block refines the aggregated spatial features into a final binary occupancy map. The output is a 200x200 grid representing a 100m x 100m physical area (-50.0m to 50.0m on the X and Y axes) with a spatial resolution of 0.5 meters per cell.
 
-### Quantitative Results
-A comprehensive threshold search was conducted to find the optimal binarization threshold for the predicted probability maps. 
+---
 
-At the optimal threshold of **0.60**, the model achieved the following performance:
-* **Occupancy IoU:** 32.44%
-* **F1 Score:** 48.99%
-* **Precision:** 53.47%
+## Training Pipeline
+The model's end-to-end training procedure is documented in the main project file. This includes the instantiation of the nuScenes dataset loaders, the EfficientNet-LSS architecture initialization, and the iterative optimization over the training splits. Supporting diagrams and architectural visuals generated during the development phase are also provided to illustrate the workflow.
+
+---
+
+## Evaluation Methodology
+The model was validated on the `v1.0-mini` split of the nuScenes dataset, processing a total of 162 validation samples. 
+
+### Custom Distance-Weighted Error
+Standard intersection metrics treat all misclassifications equally. To adapt the evaluation for autonomous driving, we introduced a custom Distance-Weighted Error metric. This applies a $1/r$ penalty weight map to the loss function, heavily penalizing occupancy prediction errors that occur closer to the ego-vehicle, where accuracy is critical for collision avoidance.
+
+---
+
+## Quantitative Results
+A thorough threshold sweep (from 0.30 to 0.80) was conducted to determine the optimal binarization point for the predicted probability maps. The trade-offs between Precision, Recall, and F1 score are fully visualized in the metric plots.
+
+The optimal threshold was identified as **0.60**, yielding the following performance metrics:
+* **Occupancy IoU:** 32.444%
+* **F1 Score:** 48.993%
+* **Precision:** 53.467%
 * **Recall:** 45.21%
-* **Distance-Weighted Error:** 0.1097
+* **Distance-Weighted Error:** 0.109755
 
-The relationship between the classification threshold and our core metrics is visualized in the generated plots (`metrics_vs_threshold.png`), demonstrating the tradeoff between precision and recall, peaking in F1 and IoU at the 0.60 mark.
+---
 
-### Qualitative Visualizations
-The evaluation script automatically generates side-by-side comparisons of the model's output against the ground truth LiDAR-derived occupancy. Examples (`bev_sample_000.jpg` through `bev_sample_007.jpg`) demonstrate the model's ability to successfully infer spatial geometry and obstacle boundaries strictly from 2D camera feeds.
+## Qualitative Results
+To visually verify the model's spatial understanding, the evaluation pipeline generates side-by-side plots containing the Predicted Probability map, the Binarized Output (at the 0.60 threshold), and the Ground Truth LiDAR map. 
 
-## Installation & Setup
-To run the evaluation notebook, ensure you have the required dependencies installed. The environment requires PyTorch and the nuScenes devkit.
+The sample outputs successfully demonstrate the model's capacity to infer road boundaries, vehicle positions, and general environment geometry strictly from camera features without depth sensor inputs.
+
+---
+
+## Installation and Setup
+
+### Dependencies
+The environment requires PyTorch, the nuScenes development kit, and various image processing libraries. Install the required packages using the following commands:
 
 ```bash
 pip install numpy==1.26.4 scipy==1.11.4 torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
 pip install nuscenes-devkit pyquaternion timm matplotlib pillow
 ```
 
-## Usage
-1.  **Dataset Preparation:** Download the nuScenes dataset (`v1.0-mini` is supported by default) and update the `DATAROOT` variable in the notebook to point to your local dataset path.
-2.  **Model Weights:** Ensure the pre-trained weights (`bev_model_final2.pth`) and configuration dictionary (`bev_cfg.pkl`) are placed in your model directory.
-3.  **Run Evaluation:** Execute the cells in `evaluate_bev_colab.ipynb`. The script will build the PyTorch DataLoader, instantiate the EfficientNet-LSS architecture, and compute predictions over the validation split.
-4.  **Output:** The script will output the optimal threshold metrics to the console, save a comprehensive JSON summary (`eval_results.json`), plot the metric curves, and generate image visualizations of the BEV predictions.
+### Execution
+1. Download the nuScenes dataset (the codebase defaults to `v1.0-mini`) and configure the `DATAROOT` path in the notebooks.
+2. Execute the cells in the main training notebook to train the model from scratch or load checkpointed weights.
+3. For validation, ensure the pre-trained weights (`bev_model_final2.pth`) and configuration file (`bev_cfg.pkl`) are accessible.
+4. Run the evaluation notebook to generate the JSON results, metric plots, and qualitative BEV sample comparisons.
