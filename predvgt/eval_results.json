@@ -1,0 +1,90 @@
+{
+  "model_weights": "/content/drive/MyDrive/BEV Model/bev_model_final2.pth",
+  "eval_split": "val",
+  "n_samples": 162,
+  "best_threshold": 0.6,
+  "best_iou_%": 32.444,
+  "best_precision_%": 53.467,
+  "best_recall_%": 45.21,
+  "best_f1_%": 48.993,
+  "best_dw_error": 0.109755,
+  "all_thresholds": {
+    "0.3": {
+      "iou_%": 20.126,
+      "precision_%": 21.631,
+      "recall_%": 74.305,
+      "f1_%": 33.508,
+      "dw_error": 0.252196
+    },
+    "0.35": {
+      "iou_%": 23.017,
+      "precision_%": 25.539,
+      "recall_%": 69.976,
+      "f1_%": 37.421,
+      "dw_error": 0.217793
+    },
+    "0.4": {
+      "iou_%": 25.89,
+      "precision_%": 29.988,
+      "recall_%": 65.449,
+      "f1_%": 41.131,
+      "dw_error": 0.188147
+    },
+    "0.45": {
+      "iou_%": 28.575,
+      "precision_%": 35.075,
+      "recall_%": 60.661,
+      "f1_%": 44.449,
+      "dw_error": 0.162445
+    },
+    "0.5": {
+      "iou_%": 30.795,
+      "precision_%": 40.875,
+      "recall_%": 55.531,
+      "f1_%": 47.089,
+      "dw_error": 0.140392
+    },
+    "0.55": {
+      "iou_%": 32.243,
+      "precision_%": 47.269,
+      "recall_%": 50.355,
+      "f1_%": 48.763,
+      "dw_error": 0.122504
+    },
+    "0.6": {
+      "iou_%": 32.444,
+      "precision_%": 53.467,
+      "recall_%": 45.21,
+      "f1_%": 48.993,
+      "dw_error": 0.109755
+    },
+    "0.65": {
+      "iou_%": 31.5,
+      "precision_%": 59.031,
+      "recall_%": 40.313,
+      "f1_%": 47.908,
+      "dw_error": 0.101388
+    },
+    "0.7": {
+      "iou_%": 29.276,
+      "precision_%": 63.795,
+      "recall_%": 35.109,
+      "f1_%": 45.292,
+      "dw_error": 0.097666
+    },
+    "0.75": {
+      "iou_%": 25.844,
+      "precision_%": 68.579,
+      "recall_%": 29.315,
+      "f1_%": 41.073,
+      "dw_error": 0.097093
+    },
+    "0.8": {
+      "iou_%": 21.094,
+      "precision_%": 74.894,
+      "recall_%": 22.699,
+      "f1_%": 34.839,
+      "dw_error": 0.09942
+    }
+  }
+}
